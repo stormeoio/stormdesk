@@ -1,11 +1,11 @@
 [package]
-name = "stormdesk"
+name = "rustdesk"
 version = "1.0.0"
 authors = ["Stormeo <developer@stormeo.io>", "rustdesk <info@rustdesk.com>"]
 edition = "2021"
 build= "build.rs"
 description = "StormDesk — Remote Desktop by Stormeo (fork of RustDesk)"
-default-run = "stormdesk"
+default-run = "rustdesk"
 rust-version = "1.75"
 
 [lib]
