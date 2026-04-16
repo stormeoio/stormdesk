@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Rounded square background -->
+  <rect x="4" y="4" width="120" height="120" rx="24" ry="24" fill="#3B82F6"/>
+  <!-- Subtle inner shadow/gradient overlay -->
+  <rect x="4" y="4" width="120" height="120" rx="24" ry="24" fill="url(#bg-grad)"/>
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#60A5FA" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#1D4ED8" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+  <!-- Monitor body -->
+  <rect x="24" y="28" width="80" height="56" rx="6" ry="6" fill="#ffffff" opacity="0.95"/>
+  <!-- Screen area -->
+  <rect x="28" y="32" width="72" height="48" rx="3" ry="3" fill="#1D4ED8"/>
+  <!-- Lightning bolt on screen -->
+  <polygon points="68,38 54,62 64,62 60,86 74,58 64,58" fill="#FBBF24"/>
+  <!-- Monitor stand -->
+  <rect x="54" y="84" width="20" height="6" rx="1" ry="1" fill="#ffffff" opacity="0.9"/>
+  <!-- Monitor base -->
+  <rect x="44" y="90" width="40" height="5" rx="2.5" ry="2.5" fill="#ffffff" opacity="0.85"/>
+  <!-- Connection dots (remote desktop indicator) -->
+  <circle cx="36" cy="100" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="46" cy="104" r="2" fill="#ffffff" opacity="0.35"/>
+  <circle cx="54" cy="106" r="1.5" fill="#ffffff" opacity="0.25"/>
+</svg>
