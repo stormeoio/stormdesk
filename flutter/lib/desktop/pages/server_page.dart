@@ -442,13 +442,13 @@ class _CmHeaderState extends State<_CmHeader>
     super.build(context);
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
+        borderRadius: BorderRadius.circular(12.0),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
-            Color(0xff00bfe1),
-            Color(0xff0071ff),
+            Color(0xFF60A5FA), // sky/blue-400
+            Color(0xFF1D4ED8), // blue-700
           ],
         ),
       ),

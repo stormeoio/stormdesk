@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 const sidebarColor = Color(0xFF0C6AF6);
-const backgroundStartColor = Color(0xFF0583EA);
-const backgroundEndColor = Color(0xFF0697EA);
+// StormeoOS titlebar gradient (sky-400 → blue-600)
+const backgroundStartColor = Color(0xFF60A5FA); // sky
+const backgroundEndColor = Color(0xFF2563EB);  // blue-600
 
 class DesktopTitleBar extends StatelessWidget {
   final Widget? child;
