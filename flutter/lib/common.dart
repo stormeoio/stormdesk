@@ -250,24 +250,25 @@ class ColorThemeExtension extends ThemeExtension<ColorThemeExtension> {
 class MyTheme {
   MyTheme._();
 
-  static const Color grayBg = Color(0xFFEFEFF2);
-  static const Color accent = Color(0xFF0071FF);
-  static const Color accent50 = Color(0x770071FF);
-  static const Color accent80 = Color(0xAA0071FF);
-  static const Color canvasColor = Color(0xFF212121);
-  static const Color border = Color(0xFFCCCCCC);
-  static const Color idColor = Color(0xFF00B6F0);
+  // StormeoOS palette (blue-500 / blue-600 / blue-700)
+  static const Color grayBg = Color(0xFFF8FAFC); // slate-50
+  static const Color accent = Color(0xFF3B82F6); // blue-500
+  static const Color accent50 = Color(0x773B82F6);
+  static const Color accent80 = Color(0xAA3B82F6);
+  static const Color canvasColor = Color(0xFF0F172A); // slate-900
+  static const Color border = Color(0xFFE2E8F0); // slate-200
+  static const Color idColor = Color(0xFF2563EB); // blue-600
   static const Color darkGray = Color.fromARGB(255, 148, 148, 148);
-  static const Color cmIdColor = Color(0xFF21790B);
-  static const Color dark = Colors.black87;
-  static const Color button = Color(0xFF2C8CFF);
-  static const Color hoverBorder = Color(0xFF999999);
+  static const Color cmIdColor = Color(0xFF16A34A); // green-600
+  static const Color dark = Color(0xFF0F172A);
+  static const Color button = Color(0xFF2563EB); // blue-600
+  static const Color hoverBorder = Color(0xFF94A3B8); // slate-400
 
-  // ListTile
+  // ListTile — shadcn-style rounded corners (12px)
   static const ListTileThemeData listTileTheme = ListTileThemeData(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
-        Radius.circular(5),
+        Radius.circular(12),
       ),
     ),
   );
@@ -1268,9 +1269,9 @@ Color? _msgboxColor(String type) {
     return Color(0xFF32bea6);
   }
   if (type.contains("error") || type == "re-input-password") {
-    return Color(0xFFE04F5F);
+    return Color(0xFFEF4444); // red-500
   }
-  return Color(0xFF2C8CFF);
+  return Color(0xFF2563EB); // blue-600 Stormeo
 }
 
 Widget msgboxIcon(String type) {

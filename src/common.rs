@@ -940,12 +940,20 @@ pub fn is_modifier(evt: &KeyEvent) -> bool {
 }
 
 pub fn check_software_update() {
-    if is_custom_client() {
-        return;
-    }
-    let opt = LocalConfig::get_option(keys::OPTION_ENABLE_CHECK_UPDATE);
-    if config::option2bool(keys::OPTION_ENABLE_CHECK_UPDATE, &opt) {
-        std::thread::spawn(move || allow_err!(do_check_software_update()));
+    // StormDesk : update check désactivé (pas de ping vers api.rustdesk.com).
+    // Les mises à jour sont distribuées via beta.stormeo.io/download/* et GitHub Releases
+    // du fork stormeoio/stormdesk. Un futur endpoint /api/public/stormdesk/version pourrait
+    // alimenter un check natif si besoin.
+    return;
+    #[allow(unreachable_code)]
+    {
+        if is_custom_client() {
+            return;
+        }
+        let opt = LocalConfig::get_option(keys::OPTION_ENABLE_CHECK_UPDATE);
+        if config::option2bool(keys::OPTION_ENABLE_CHECK_UPDATE, &opt) {
+            std::thread::spawn(move || allow_err!(do_check_software_update()));
+        }
     }
 }
 

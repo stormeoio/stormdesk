@@ -1088,14 +1088,18 @@ void showAbout(OverlayDialogManager dialogManager) {
       title: Text(translate('About RustDesk')),
       content: Wrap(direction: Axis.vertical, spacing: 12, children: [
         Text('Version: $version'),
+        Text('StormDesk by StormeoOS',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+        Text('Une solution développée avec amour par Stormeo grâce à RustDesk <3',
+            style: TextStyle(fontStyle: FontStyle.italic)),
         InkWell(
             onTap: () async {
-              const url = 'https://rustdesk.com/';
+              const url = 'https://stormeo.io/';
               await launchUrl(Uri.parse(url));
             },
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text('rustdesk.com',
+              child: Text('stormeo.io',
                   style: TextStyle(
                     decoration: TextDecoration.underline,
                   )),

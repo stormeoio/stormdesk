@@ -2389,7 +2389,7 @@ class _AboutState extends State<_About> {
                         .marginSymmetric(vertical: 4.0)),
               InkWell(
                   onTap: () {
-                    launchUrlString('https://rustdesk.com/privacy.html');
+                    launchUrlString('https://stormeo.io/privacy');
                   },
                   child: Text(
                     translate('Privacy Statement'),
@@ -2397,16 +2397,31 @@ class _AboutState extends State<_About> {
                   ).marginSymmetric(vertical: 4.0)),
               InkWell(
                   onTap: () {
-                    launchUrlString('https://rustdesk.com');
+                    launchUrlString('https://stormeo.io');
                   },
                   child: Text(
                     translate('Website'),
                     style: linkStyle,
                   ).marginSymmetric(vertical: 4.0)),
+              InkWell(
+                  onTap: () {
+                    launchUrlString('https://github.com/stormeoio/stormdesk');
+                  },
+                  child: Text(
+                    'Code source (AGPL-3.0)',
+                    style: linkStyle,
+                  ).marginSymmetric(vertical: 4.0)),
               Container(
-                decoration: const BoxDecoration(color: Color(0xFF2c8cff)),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 padding:
-                    const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 child: SelectionArea(
                     child: Row(
                   children: [
@@ -2415,15 +2430,29 @@ class _AboutState extends State<_About> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Copyright © ${DateTime.now().toString().substring(0, 4)} Purslane Ltd.\n$license',
-                            style: const TextStyle(color: Colors.white),
+                            'StormDesk by StormeoOS',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
+                          const SizedBox(height: 6),
                           Text(
-                            translate('Slogan_tip'),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white),
-                          )
+                            'Une solution développée avec amour par Stormeo grâce à RustDesk <3',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            '© ${DateTime.now().toString().substring(0, 4)} Stormeo · Fork AGPL-3.0 de RustDesk © Purslane Ltd.\n$license',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                            ),
+                          ),
                         ],
                       ),
                     ),

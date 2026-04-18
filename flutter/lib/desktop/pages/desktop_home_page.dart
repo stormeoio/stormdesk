@@ -197,8 +197,15 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         textBaseline: TextBaseline.alphabetic,
         children: [
           Container(
-            width: 2,
-            decoration: const BoxDecoration(color: MyTheme.accent),
+            width: 4,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+              ),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ).marginOnly(top: 5),
           Expanded(
             child: Padding(
@@ -303,9 +310,16 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         textBaseline: TextBaseline.alphabetic,
         children: [
           Container(
-            width: 2,
+            width: 4,
             height: 52,
-            decoration: BoxDecoration(color: MyTheme.accent),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+              ),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
           Expanded(
             child: Padding(
