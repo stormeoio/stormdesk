@@ -60,15 +60,228 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   Widget build(BuildContext context) {
     super.build(context);
     final isIncomingOnly = bind.isIncomingOnly();
+
+    // Mode client-only (incoming-only build) : UI centrée simple (pas de technicien)
+    if (isIncomingOnly) {
+      return _buildBlock(child: buildLeftPane(context));
+    }
+
+    // Mode normal StormeoOS : header cards horizontales (Votre bureau + Autorisations
+    // si requises) + peer list plein largeur en bas.
     return _buildBlock(
-        child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        buildLeftPane(context),
-        if (!isIncomingOnly) const VerticalDivider(width: 1),
-        if (!isIncomingOnly) Expanded(child: buildRightPane(context)),
+        _buildStormeoTopCards(context),
+        const Divider(height: 1),
+        Expanded(child: buildRightPane(context)),
       ],
     ));
+  }
+
+  /// Top cards StormeoOS : "Votre bureau" (prominent gradient) + "Autorisations"
+  /// (conditionnelle, si permissions manquent).
+  Widget _buildStormeoTopCards(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      child: IntrinsicHeight(
+        child: Obx(() {
+          // trigger Obx : buildHelpCards lit ces states
+          final _ = stateGlobal.updateUrl.value;
+          final __ = svcStopped.value;
+          final authzCard = _extractAuthorizationCardIfNeeded(context);
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(flex: 2, child: _buildYourDesktopCard(context)),
+              if (authzCard != null) ...[
+                const SizedBox(width: 16),
+                SizedBox(width: 340, child: authzCard),
+              ],
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  /// Card "Votre bureau" — hero gradient Stormeo avec ID + Mot de passe en évidence.
+  /// Pensé pour l'utilisateur final qui reçoit un support : il doit juste
+  /// communiquer ces 2 infos à son technicien.
+  Widget _buildYourDesktopCard(BuildContext context) {
+    final model = gFFI.serverModel;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF7DD3FC), // sky-300
+            Color(0xFF38BDF8), // sky-400
+            Color(0xFF2563EB), // blue-600 Stormeo
+          ],
+          stops: [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF3B82F6).withOpacity(0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ─── Header ──────────────────────────────────
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.computer_rounded,
+                    color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Votre bureau',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Communiquez ces informations à votre technicien',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.88),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+          // ─── ID + Password en grands ─────────────────
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _buildHeroField(
+                  label: 'Identifiant',
+                  valueWidget: _IDFieldDisplay(model: model),
+                  onCopy: () {
+                    Clipboard.setData(
+                        ClipboardData(text: model.serverId.text));
+                    showToast(translate("Copied"));
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildHeroField(
+                  label: 'Mot de passe à usage unique',
+                  valueWidget: _PasswordFieldDisplay(),
+                  onCopy: () {
+                    Clipboard.setData(ClipboardData(text: model.serverPasswd.text));
+                    showToast(translate("Copied"));
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroField({
+    required String label,
+    required Widget valueWidget,
+    required VoidCallback onCopy,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.white.withOpacity(0.8),
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(child: valueWidget),
+              IconButton(
+                onPressed: onCopy,
+                iconSize: 18,
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(),
+                icon: Icon(Icons.copy_rounded,
+                    color: Colors.white.withOpacity(0.9)),
+                tooltip: translate('Copy'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Retourne une carte "Autorisations" stylisée StormeoOS si au moins une
+  /// permission macOS est pending. Sinon null (carte masquée).
+  Widget? _extractAuthorizationCardIfNeeded(BuildContext context) {
+    final Widget raw = buildHelpCards(stateGlobal.updateUrl.value);
+    // buildHelpCards retourne Container() vide quand rien à signaler
+    if (raw is Container && raw.child == null) return null;
+    // Wrap dans une card shadcn-style ambre pour attirer l'attention
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB), // amber-50
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFFCD34D), // amber-300
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFF59E0B).withOpacity(0.12),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: raw,
+    );
   }
 
   Widget _buildBlock({required Widget child}) {
@@ -1204,4 +1417,57 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
       onCancel: close,
     );
   });
+}
+
+/// Affichage stylisé de l'ID utilisateur dans la card "Votre bureau" (v1.1 redesign).
+/// Écoute le TextEditingController de ServerModel pour refléter les mises à jour live.
+class _IDFieldDisplay extends StatelessWidget {
+  final ServerModel model;
+  const _IDFieldDisplay({required this.model});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: model.serverId,
+      builder: (_, __) {
+        final text = model.serverId.text;
+        return Text(
+          text.isEmpty ? '· · ·' : text,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            fontFamily: 'monospace',
+            letterSpacing: 1.2,
+          ),
+          overflow: TextOverflow.ellipsis,
+        );
+      },
+    );
+  }
+}
+
+/// Affichage stylisé du mot de passe à usage unique dans la card "Votre bureau".
+class _PasswordFieldDisplay extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final model = gFFI.serverModel;
+    return AnimatedBuilder(
+      animation: model.serverPasswd,
+      builder: (_, __) {
+        final text = model.serverPasswd.text;
+        return Text(
+          text.isEmpty ? '· · · · · ·' : text,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            fontFamily: 'monospace',
+            letterSpacing: 1.5,
+          ),
+          overflow: TextOverflow.ellipsis,
+        );
+      },
+    );
+  }
 }
