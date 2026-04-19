@@ -91,8 +91,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         child: loadLogo(),
       ),
       buildTip(context),
-      if (!isOutgoingOnly) buildIDBoard(context),
-      if (!isOutgoingOnly) buildPasswordBoard(context),
+      if (!isOutgoingOnly) _buildStormeoCard(context, buildIDBoard(context)),
+      if (!isOutgoingOnly)
+        _buildStormeoCard(context, buildPasswordBoard(context)),
       FutureBuilder<Widget>(
         future: Future.value(
             Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
@@ -190,7 +191,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   buildIDBoard(BuildContext context) {
     final model = gFFI.serverModel;
     return Container(
-      margin: const EdgeInsets.only(left: 20, right: 11),
+      // Margin réduit car parent _buildStormeoCard applique déjà padding+margin
+      margin: const EdgeInsets.only(left: 6, right: 4),
       height: 57,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -304,7 +306,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     final showOneTime = model.approveMode != 'click' &&
         model.verificationMethod != kUsePermanentPassword;
     return Container(
-      margin: EdgeInsets.only(left: 20.0, right: 16, top: 13, bottom: 13),
+      // Margin réduit car parent _buildStormeoCard applique déjà padding
+      margin: EdgeInsets.only(left: 6.0, right: 4, top: 4, bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
@@ -440,6 +443,39 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             ),
         ],
       ),
+    );
+  }
+
+  /// Wrapper StormeoOS : enrobe un enfant dans une card arrondie
+  /// avec fond subtil bleuté + shadow douce, pour homogénéiser
+  /// visuellement avec l'univers Stormeo (shadcn-style).
+  Widget _buildStormeoCard(BuildContext context, Widget child) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF1E293B) // slate-800
+            : const Color(0xFFF1F5F9), // slate-100 (plutôt que blanc pur)
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : const Color(0xFFE2E8F0), // slate-200
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.2)
+                : const Color(0xFF3B82F6).withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
+      child: child,
     );
   }
 
@@ -624,11 +660,20 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
+                    Color(0xFF7DD3FC), // sky-300 — ciel clair
+                    Color(0xFF38BDF8), // sky-400
                     Color(0xFF3B82F6), // blue-500 Stormeo
-                    Color(0xFF1D4ED8), // blue-700
                   ],
+                  stops: [0.0, 0.5, 1.0],
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF3B82F6).withOpacity(0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               padding: const EdgeInsets.all(20),
               child: Column(
