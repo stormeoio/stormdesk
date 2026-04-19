@@ -110,7 +110,17 @@ class _SplashPageState extends State<SplashPage>
   }
 
   Widget _buildSplash(BuildContext context) {
-    return Container(
+    // Material + DefaultTextStyle pour éviter les soulignements jaunes du debug Flutter
+    // quand un Text n'a pas de parent Material/MaterialApp.
+    return Material(
+      type: MaterialType.transparency,
+      child: DefaultTextStyle(
+        style: const TextStyle(
+          color: Colors.white,
+          decoration: TextDecoration.none,
+          fontFamily: '.SF Pro Text',
+        ),
+        child: Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -221,8 +231,11 @@ class _SplashPageState extends State<SplashPage>
               },
             ),
           ],
-        ),
-      ),
+        ), // Column
+      ), // Center
+    ), // Container
+        ), // DefaultTextStyle
+      ), // Material
     );
   }
 

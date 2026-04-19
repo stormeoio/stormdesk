@@ -76,7 +76,9 @@ class DesktopSettingPage extends StatefulWidget {
     if (!bind.isIncomingOnly()) SettingsTabKey.display,
     if (!isWeb && !bind.isIncomingOnly() && bind.pluginFeatureIsEnabled())
       SettingsTabKey.plugin,
-    if (!bind.isDisableAccount()) SettingsTabKey.account,
+    // Onglet "Compte" retiré : StormDesk utilise auth ed25519 du relay self-hosted,
+    // pas les comptes rustdesk.com. Le code reste actif pour dev/debug mais masqué.
+    // if (!bind.isDisableAccount()) SettingsTabKey.account,
     if (isWindows &&
         bind.mainGetBuildinOption(key: kOptionHideRemotePrinterSetting) != 'Y')
       SettingsTabKey.printer,
@@ -2412,53 +2414,50 @@ class _AboutState extends State<_About> {
                     style: linkStyle,
                   ).marginSymmetric(vertical: 4.0)),
               Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                margin: const EdgeInsets.only(top: 12),
                 padding:
-                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9), // slate-100
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: const Color(0xFFE2E8F0), // slate-200
+                    width: 1,
+                  ),
+                ),
                 child: SelectionArea(
-                    child: Row(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'StormDesk by StormeoOS',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Une solution développée avec amour par Stormeo grâce à RustDesk <3',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            '© ${DateTime.now().toString().substring(0, 4)} Stormeo · Fork AGPL-3.0 de RustDesk © Purslane Ltd.\n$license',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      'StormDesk by Stormeo · Une solution développée avec amour grâce à RustDesk ❤',
+                      style: TextStyle(
+                        color: const Color(0xFF475569), // slate-600
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '© ${DateTime.now().toString().substring(0, 4)} Stormeo · Fork AGPL-3.0 de RustDesk © Purslane Ltd.',
+                      style: TextStyle(
+                        color: const Color(0xFF94A3B8), // slate-400
+                        fontSize: 11,
+                      ),
+                    ),
+                    if (license.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        license,
+                        style: TextStyle(
+                          color: const Color(0xFF94A3B8),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ],
                 )),
-              ).marginSymmetric(vertical: 4.0)
+              )
             ],
           ).marginOnly(left: _kContentHMargin)
         ]),
