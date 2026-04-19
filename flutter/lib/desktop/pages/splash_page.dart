@@ -230,13 +230,12 @@ class _SplashPageState extends State<SplashPage>
                 );
               },
             ),
-          ],
-        ), // Column
-      ), // Center
-    ), // Container
+            ],
+          ), // Column
+        ), // Center
+      ), // Container
         ), // DefaultTextStyle
-      ), // Material
-    );
+      ); // Material + return
   }
 
   Widget _buildRadarRing({required double delay}) {
