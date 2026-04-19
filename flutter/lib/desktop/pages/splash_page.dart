@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_hbb/models/state_model.dart';
+import 'package:get/get.dart';
 
 /// Splash screen StormeoOS affiché à l'ouverture de StormDesk
 /// pendant que le service relay se connecte.
@@ -31,6 +32,7 @@ class _SplashPageState extends State<SplashPage>
   Timer? _maxTimer;
   Timer? _minTimer;
   bool _minElapsed = false;
+  StreamSubscription<SvcStatus>? _statusSub;
   late AnimationController _radarController;
   late AnimationController _logoController;
   late AnimationController _dotsController;
@@ -59,13 +61,10 @@ class _SplashPageState extends State<SplashPage>
       _minElapsed = true;
       _hide();
     });
-    stateGlobal.svcStatus.addListener(_onSvcStatusChanged);
-  }
-
-  void _onSvcStatusChanged() {
-    if (stateGlobal.svcStatus.value == SvcStatus.ready) {
-      _maybeHide();
-    }
+    // Abonnement au stream Rx<SvcStatus> de GetX
+    _statusSub = stateGlobal.svcStatus.listen((status) {
+      if (status == SvcStatus.ready) _maybeHide();
+    });
   }
 
   void _maybeHide() {
@@ -81,7 +80,7 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   void dispose() {
-    stateGlobal.svcStatus.removeListener(_onSvcStatusChanged);
+    _statusSub?.cancel();
     _minTimer?.cancel();
     _maxTimer?.cancel();
     _radarController.dispose();
