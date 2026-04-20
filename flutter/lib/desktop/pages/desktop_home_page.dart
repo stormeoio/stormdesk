@@ -204,6 +204,13 @@ class _DesktopHomePageState extends State<DesktopHomePage>
               ),
             ],
           ),
+          // ─── Pills statut permissions (macOS) ─────────
+          if (isMacOS) ...[
+            const SizedBox(height: 18),
+            const Divider(color: Colors.white24, height: 1),
+            const SizedBox(height: 12),
+            _buildPermissionStatusPills(),
+          ],
         ],
       ),
     );
@@ -256,13 +263,45 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     );
   }
 
-  /// Retourne une carte "Autorisations" stylisée StormeoOS si au moins une
-  /// permission macOS est pending. Sinon null (carte masquée).
+  /// Récupère l'état des permissions macOS requises pour le support à distance.
+  List<_PermStatus> _getMacosPermissions() {
+    if (!isMacOS) return const [];
+    final isOutgoingOnly = bind.isOutgoingOnly();
+    return [
+      _PermStatus(
+        label: "Enregistrement d'écran",
+        granted: isOutgoingOnly || bind.mainIsCanScreenRecording(prompt: false),
+        onConfigure: () {
+          bind.mainIsCanScreenRecording(prompt: true);
+          watchIsCanScreenRecording = true;
+        },
+      ),
+      _PermStatus(
+        label: 'Accessibilité',
+        granted: isOutgoingOnly || bind.mainIsProcessTrusted(prompt: false),
+        onConfigure: () {
+          bind.mainIsProcessTrusted(prompt: true);
+          watchIsProcessTrust = true;
+        },
+      ),
+      _PermStatus(
+        label: 'Saisie clavier/souris',
+        granted: bind.mainIsCanInputMonitoring(prompt: false),
+        onConfigure: () {
+          bind.mainIsCanInputMonitoring(prompt: true);
+          watchIsInputMonitoring = true;
+        },
+      ),
+    ];
+  }
+
+  /// Card "Autorisations" compacte avec liste des 3 permissions macOS.
+  /// Chaque permission non-accordée a son propre bouton "Configurer" inline.
+  /// Masquée (null) si toutes accordées.
   Widget? _extractAuthorizationCardIfNeeded(BuildContext context) {
-    final Widget raw = buildHelpCards(stateGlobal.updateUrl.value);
-    // buildHelpCards retourne Container() vide quand rien à signaler
-    if (raw is Container && raw.child == null) return null;
-    // Wrap dans une card shadcn-style ambre pour attirer l'attention
+    final perms = _getMacosPermissions();
+    if (perms.isEmpty || perms.every((p) => p.granted)) return null;
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFFFFBEB), // amber-50
@@ -279,8 +318,143 @@ class _DesktopHomePageState extends State<DesktopHomePage>
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
-      child: raw,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.shield_outlined,
+                  color: Color(0xFFD97706), size: 18),
+              const SizedBox(width: 7),
+              const Text(
+                'Autorisations requises',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: Color(0xFF92400E),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'macOS doit autoriser StormDesk pour la prise en main.',
+            style: TextStyle(
+                fontSize: 11, color: Color(0xFF78350F), height: 1.3),
+          ),
+          const SizedBox(height: 10),
+          ...perms.map(_buildPermissionRow),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPermissionRow(_PermStatus perm) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Icon(
+            perm.granted
+                ? Icons.check_circle_rounded
+                : Icons.radio_button_unchecked_rounded,
+            color: perm.granted
+                ? const Color(0xFF16A34A)
+                : const Color(0xFFD97706),
+            size: 16,
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              perm.label,
+              style: TextStyle(
+                fontSize: 12,
+                color: perm.granted
+                    ? const Color(0xFF78350F)
+                    : const Color(0xFF92400E),
+                fontWeight:
+                    perm.granted ? FontWeight.w400 : FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (!perm.granted)
+            SizedBox(
+              height: 24,
+              child: ElevatedButton(
+                onPressed: perm.onConfigure,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  backgroundColor: const Color(0xFFF59E0B),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Configurer',
+                  style: TextStyle(
+                      fontSize: 11, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Petites pills de statut permissions, affichées en bas de "Votre bureau".
+  /// Visibles à tout moment pour donner un aperçu (vert = OK, ambre = manquante).
+  Widget _buildPermissionStatusPills() {
+    final perms = _getMacosPermissions();
+    if (perms.isEmpty) return const SizedBox.shrink();
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      children: perms.map(_buildStatusPill).toList(),
+    );
+  }
+
+  Widget _buildStatusPill(_PermStatus perm) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.25),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            perm.granted
+                ? Icons.check_circle_rounded
+                : Icons.warning_amber_rounded,
+            color: perm.granted
+                ? const Color(0xFFA7F3D0) // green-200 sur fond bleu
+                : const Color(0xFFFDE68A), // amber-200
+            size: 13,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            perm.label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1416,6 +1590,18 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
       onSubmit: canSubmit ? submit : null,
       onCancel: close,
     );
+  });
+}
+
+/// Représente l'état d'une permission macOS (Screen Recording, Accessibility, etc).
+class _PermStatus {
+  final String label;
+  final bool granted;
+  final VoidCallback onConfigure;
+  const _PermStatus({
+    required this.label,
+    required this.granted,
+    required this.onConfigure,
   });
 }
 
